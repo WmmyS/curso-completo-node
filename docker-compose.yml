@@ -1,0 +1,30 @@
+services:
+  database:
+    image: mysql:5.7
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: 'mysql-container'
+    environment:
+      MYSQL_DATABASE: 'teste'
+      MYSQL_ROOT_PASSWORD: '123'
+      MYSQL_USER: docker
+      MYSQL_PASSWORD: '123'
+    networks:
+      - database
+    ports:
+      - 3308:3306
+
+    volumes:
+      - dbdata:/var/lib/mysql
+
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      timeout: 20s
+      
+networks:
+  database:
+
+volumes:
+  dbdata:
+    driver: local
+    labels:
+      name: "Teste"
