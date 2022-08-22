@@ -11,5 +11,11 @@ module.exports.iniciaChat = function(application, req, res) {
         return;
     }
 
-    res.render('chat');
+    // Recuperação da variável com a instância do objeto io para ser utilizada no controle
+    application.get('io').emit(
+        'msgParaCliente', 
+        {apelido: dadosForm.apelido, mensagem: ' acabou de entrar no chat'}
+    )
+
+    res.render('chat', {dadosForm: dadosForm});
 }
