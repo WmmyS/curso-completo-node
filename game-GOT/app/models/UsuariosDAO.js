@@ -1,17 +1,14 @@
 function UsuariosDAO(connection) {
-    this._connection = connection
+    this._connection = connection()
 }
 
 UsuariosDAO.prototype.inserirUsuario = async function(usuario){
     
-    const usuarioCollection = this._connection.collection('usuarios');
-    await usuarioCollection.insertMany([usuario])
-    
-    /* open(function(error, mongoClient){
-        mongoClient.collection("usuarios", function(error,collection){
-            collection.insert(usuario);
-        })
-    }) */
+    const usuarioCollection = this._connection.collection('usuario');
+    const saved = await usuarioCollection.insertOne(usuario)
+    if (saved) {
+        console.log('Usuário salvo com sucesso');
+    }
 }
 
 module.exports = function() {

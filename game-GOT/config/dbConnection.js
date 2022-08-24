@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const connectMongoDb = function() {
+function connectMongoDb() {
     const url = 'mongodb://localhost:27017';
     const client = new MongoClient(url);
 
@@ -11,6 +11,6 @@ const connectMongoDb = function() {
     return db; 
 }
 
-module.exports = async function() {
-    return await connectMongoDb;
+module.exports = function() {
+    return connectMongoDb;
 }
