@@ -22,5 +22,7 @@ module.exports.cadastrar = function (application, req, res) {
 
     UsuariosDAO.inserirUsuario(dadosForm)
 
+    //geração dos parâmetros
+
     res.send('podemos cadastrar');
 }

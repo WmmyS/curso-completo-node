@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-function connectMongoDb() {
+async function connectMongoDb(callback) {
     const url = 'mongodb://localhost:27017';
     const client = new MongoClient(url);
 
@@ -8,7 +8,9 @@ function connectMongoDb() {
     console.log('Database conectada com sucesso');
     const db = client.db('got');
 
-    return db; 
+    const result = await callback(db);
+    if(result === 0) client.close();
+    console.log('Conexão com database encerrada');
 }
 
 module.exports = function() {
