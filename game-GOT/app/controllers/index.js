@@ -1,24 +1,26 @@
-module.exports.index = function (application, req, res) {
-    res.render('index', {validacao: {}});
+module.exports.index = function(application, req, res){
+    res.render('index', { validacao: {} });
 }
 
-module.exports.autenticar = function (application, req, res) {
-    const dadosForm = req.body;
+module.exports.autenticar = function(application, req, res){
+    
+    var dadosForm = req.body;
 
-    req.assert('usuario', 'Usuário não pode estar vazio').notEmpty();
-    req.assert('senha', 'Senha necessária para autenticação').notEmpty();
+    req.assert('usuario', 'Usuário não pode ser vazio').notEmpty();
+    req.assert('senha', 'Senha não pode ser vazia').notEmpty();
 
-    const erros = req.validationErrors();
+    var erros = req.validationErrors();
 
-    if(erros) {
-        res.render("index", { validacao: erros })
+    if(erros){
+        res.render('index', { validacao: erros });
         return;
     }
 
-    const connection = application.config.dbConnection;
-    const UsuariosDAO = new application.app.models.UsuariosDAO(connection);
+    var connection = application.config.dbConnection;
+    var UsuariosDAO = new application.app.models.UsuariosDAO(connection);
 
     UsuariosDAO.autenticar(dadosForm, req, res);
 
-    //res.send('Tudo ok para criar a sessão');
+    //res.send('tudo ok para criar a sessão');
+
 }

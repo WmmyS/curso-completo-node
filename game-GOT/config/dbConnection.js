@@ -1,18 +1,21 @@
-const { MongoClient } = require('mongodb');
+/* importar o mongodb */
+var mongo = require('mongodb');
 
-async function connectMongoDb(callback) {
-    const url = 'mongodb://localhost:27017';
-    const client = new MongoClient(url);
+var connMongoDB = function(){
+    console.log('Entrou na função de conexão');
+    var db = new mongo.Db(
+        'got',
+        new mongo.Server(
+            'localhost', // string contendo o endereço do servidor
+            27017, // porta de conexão
+            {}
+        ),
+        {}
+    );
 
-    client.connect();
-    console.log('Database conectada com sucesso');
-    const db = client.db('got');
-
-    const result = await callback(db);
-    if(result === 0) client.close();
-    console.log('Conexão com database encerrada');
+    return db;
 }
 
-module.exports = function() {
-    return connectMongoDb;
+module.exports = function(){
+    return connMongoDB;
 }
