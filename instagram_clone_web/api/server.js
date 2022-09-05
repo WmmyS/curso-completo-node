@@ -1,12 +1,15 @@
 const express = require('express'),
     bodyParser = require('body-parser'),
+    multiparty = require('connect-multiparty'),
     mongodb = require('mongodb'),
     objectId = require('mongodb').ObjectId;
+    fs = require('fs');
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); //responsável por receber conteúdo x-www-form-urlencoded
+app.use(bodyParser.json()); //responsável por receber conteúdo json
+app.use(multiparty()); //responsável por receber conteúdo de arquivos
 
 const port = 8080;
 app.listen(port);
@@ -20,18 +23,40 @@ app.get('/', function(req, res) {
 
 //Insert
 app.post('/api', function(req, res) {
-    const dados = req.body
 
-    db.open(function(error, mongoclient) {
-        mongoclient.collection('postagens', function(error, collection) {
-            collection.insert(dados, function(error, records) {
-                if (error) {
-                    res.json(error)
-                } else {
-                    res.json(records);
-                }
+    /**
+     * Aceita dois parâmetros, propriedade a ser definida e valor a ser atribuído à propriedade.
+     * Aqui estamos habilitando nossa api para responser a qualquer domínio.
+     */
+    res.setHeader("Access-Control-Allow-Origin", "*");
 
-                mongoclient.close();
+    const date = new Date();
+    const time_stamp = date.getTime();
+    const urlImage = time_stamp + '_' + req.files.arquivo.originalFilename;
+    const pathOrign = req.files.arquivo.path;
+    const pathDestiny = './uploads/' + urlImage;
+    
+    fs.rename(pathOrign, pathDestiny, function(error) { //parâmetros recebinos no rename: origem, destino e callback
+        if(error) {
+            res.status(500).json({error: error});
+            return;
+        }
+
+        const dados = {
+            url_image: urlImage,
+            titulo: req.body.titulo
+        }
+
+        db.open(function(error, mongoclient) {
+            mongoclient.collection('postagens', function(error, collection) {
+                collection.insert(dados, function(error, records) {
+                    if (error) {
+                        res.json(error)
+                    } else {
+                        res.json({'status':'Inclusão realizada com sucesso'});
+                    }
+                    mongoclient.close();
+                })
             })
         })
     })
@@ -39,6 +64,9 @@ app.post('/api', function(req, res) {
 
 //Get All
 app.get('/api', function(req, res) {
+
+    res.setHeader("Access-Control-Allow-Origin", "*");
+
     db.open(function(error, mongoclient) {
         mongoclient.collection('postagens', function(error, collection) {
             collection.find().toArray(function(err, results) {
@@ -69,6 +97,19 @@ app.get('/api/:id', function(req, res) {
     })
 })
 
+app.get('/imagens/:imagem', function(req, res) {
+    const img = req.params.imagem;
+    fs.readFile('./uploads/' + img, function(error, fileContent){
+        if (error) {
+            res.status(400).json(error);
+            return;
+        }
+
+        res.writeHead(200, {'content-Type': 'image/jpg'}) // O navegador irá entender que o que foi recebido é uma imagem
+        res.end(fileContent);
+    })
+})
+
 //Update By Id
 app.put('/api/:id', function(req, res) {
     db.open(function(error, mongocliente) {
@@ -83,7 +124,6 @@ app.put('/api/:id', function(req, res) {
                     } else {
                         res.json(records);
                     }
-
                     mongocliente.close();
                 }
             );
@@ -103,7 +143,6 @@ app.delete('/api/:id', function(req, res) {
                     } else {
                         res.json(records);
                     }
-
                     mongocliente.close();
                 }
             );
