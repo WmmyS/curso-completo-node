@@ -10,7 +10,13 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: true })); //responsável por receber conteúdo x-www-form-urlencoded
 app.use(bodyParser.json()); //responsável por receber conteúdo json
 app.use(multiparty()); //responsável por receber conteúdo de arquivos
-
+app.use(function (req, res, next) { // Middleware para permissão de requisição
+    res.header('Access-Control-Allow-Origin', '*'); //permitir o acesso às rotas
+    res.header('Access-Control-Allow-Methods', "GET, POST, PUT, DELETE"), //Permitir os métodos
+    res.header('Access-Control-Allow-Headers', "content-type"), // Serve para permitir o recebimento de um json
+    res.header('Access-Control-Allow-Credentials', true);
+    next();
+})
 const port = 8080;
 app.listen(port);
 
@@ -28,7 +34,6 @@ app.post('/api', function(req, res) {
      * Aceita dois parâmetros, propriedade a ser definida e valor a ser atribuído à propriedade.
      * Aqui estamos habilitando nossa api para responser a qualquer domínio.
      */
-    res.setHeader("Access-Control-Allow-Origin", "*");
 
     const date = new Date();
     const time_stamp = date.getTime();
@@ -64,8 +69,6 @@ app.post('/api', function(req, res) {
 
 //Get All
 app.get('/api', function(req, res) {
-
-    res.setHeader("Access-Control-Allow-Origin", "*");
 
     db.open(function(error, mongoclient) {
         mongoclient.collection('postagens', function(error, collection) {
@@ -112,7 +115,8 @@ app.get('/imagens/:imagem', function(req, res) {
 
 //Update By Id
 app.put('/api/:id', function(req, res) {
-    db.open(function(error, mongocliente) {
+    res.send(req.body.comentario)
+    /* db.open(function(error, mongocliente) {
         mongocliente.collection('postagens', function(error, collection) {
             collection.update(
                 {_id: objectId(req.params.id)},
@@ -128,7 +132,7 @@ app.put('/api/:id', function(req, res) {
                 }
             );
         })
-    })
+    }) */
 })
 
 //Delete By Id

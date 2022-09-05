@@ -54,7 +54,14 @@
 								const id_input_comentario = 'postagem_' + id;
 								const comentario = $('#' + id_input_comentario).val();
 
-								alert(comentario);
+								const vhr = new XMLHttpRequest();
+								xhr.open('PUT', 'http://localhost:8080/api/' + id)
+								xhr.setRequestHeader('Content-Type', 'application/json'); //Passa para o servidor o tipo de content-type a ser enviado
+								xhr.send(JSON.stringify({comentario: comentario }));
+
+								xhr.onload = function(){
+									alert(xhr.responseText)
+								}
 							})
 						}
 					}
